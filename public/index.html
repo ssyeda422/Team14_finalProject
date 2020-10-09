@@ -9,6 +9,186 @@
 
 <body>
     Hello world
+    <a href="/auth">LOGIN</a>
+
 </body>
+<script>
+    window.onload = () => {
+        createOrUpdateSettings('#dfadea', 'blue', 'white', '#171717')
+    }
+
+
+    // Function should be implemented to log error in html
+    //Function runs when error occurs like user not being logged in
+    function logError(error) {
+        console.warn(error) //place holder
+    }
+
+    // Function returns object of settings.
+    // Empty if not logged in or settings dont exist
+    function getSettings() {
+        let settings = {}
+
+        fetch("/settings")
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    settings = json
+                } else {
+                    logError(json.error)
+                }
+            })
+
+        return settings
+    }
+
+    //Function creates or updates settings also returns settings.
+    // MUST include all params
+    function createOrUpdateSettings(
+        backgroundColor,
+        primaryColor,
+        accentColor,
+        fontColor
+    ) {
+        let settings = {}
+
+        fetch("/updatesettings", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    backgroundColor,
+                    primaryColor,
+                    accentColor,
+                    fontColor
+                })
+            }).then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    settings = json
+                } else {
+                    logError(json.error)
+                }
+            })
+
+        return settings
+    }
+
+    // Function returns list of box objects.
+    // Empty if not logged in or settings dont exist
+    function getBoxes() {
+        let boxes = []
+
+        fetch("/data")
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json
+                } else {
+                    logError(json.error)
+                }
+            })
+
+        return boxes
+    }
+
+    // Function adds a box 
+    // title: is a string
+    // PosX and PosY:  is a number
+    // type: should be specific strings ('todo','text','link')
+    // items: is a list of whatever you want
+    // also returns boxes
+    function addBox({
+        title,
+        posX,
+        posY,
+        type,
+        items
+    }) {
+        let boxes = []
+
+        fetch("/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: title.value,
+                    description: description.value
+                }),
+            })
+            .then((res) => res.json())
+            .then((json) => {
+                if (!json.error) {
+                    boxes = json
+                } else {
+                    logError(json.error)
+                }
+            })
+
+        return boxes
+    }
+
+    // Function updates a box
+    // Returns updated boxes
+    function updateBox(
+        _id,
+        title,
+        posX,
+        posY,
+        type,
+        items) {
+        let boxes = []
+
+        fetch("/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    _id,
+                    title,
+                    description
+                }),
+            })
+            .then((res) => res.json())
+            .then((json) => {
+                if (!json.error) {
+                    boxes = json
+                } else {
+                    logError(json.error)
+                }
+            })
+
+        return boxes
+    }
+
+    //Function deletes entire box
+    // also returns boxes
+    function deleteBox(_id) {
+        let boxes = []
+
+        fetch("/remove", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    _id
+                }),
+            })
+            .then((res) => res.json())
+            .then((json) => {
+                if (!json.error) {
+                    boxes = json
+                } else {
+                    logError(json.error)
+                }
+            });
+
+        return boxes;
+    }
+</script>
 
 </html>

@@ -98,7 +98,7 @@ app.get("/settings", async(req, res) => {
 
     await client.close();
 
-    return res.json(docs);
+    return res.json(docs.length === 0 ? {} : docs[0]);
 });
 
 app.post("/updatesettings", bodyParser.json(), async(req, res) => {
@@ -116,7 +116,7 @@ app.post("/updatesettings", bodyParser.json(), async(req, res) => {
 
     if (settings.length === 0) {
 
-        await collection.insertOne({
+        let ins = await collection.insertOne({
             backgroundColor: newSettings.backgroundColor,
             primaryColor: newSettings.primaryColor,
             accentColor: newSettings.accentColor,
@@ -125,9 +125,8 @@ app.post("/updatesettings", bodyParser.json(), async(req, res) => {
         });
 
     } else {
-        let _id = new mongodb.ObjectID(newItem._id);
 
-        await collection.updateOne({ user: req.user._id, _id }, {
+        let up = await collection.updateOne({ user: req.user._id }, {
             $set: {
                 backgroundColor: newSettings.backgroundColor,
                 primaryColor: newSettings.primaryColor,
@@ -138,10 +137,11 @@ app.post("/updatesettings", bodyParser.json(), async(req, res) => {
     }
 
 
-    const returnSettings = await collection.find({ user: req.user._id }).toArray()[0];
+    const returnSettings = await collection.find({ user: req.user._id }).toArray();
+
     await client.close();
 
-    return res.json(returnSettings);
+    return res.json(returnSettings[0]);
 });
 
 
