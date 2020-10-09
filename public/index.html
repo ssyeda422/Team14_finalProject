@@ -13,7 +13,9 @@
 
 </body>
 <script>
-    window.onload = () => {}
+    window.onload = () => {
+        deleteBox('5f80beee557ab830bd097b16')
+    }
 
 
     // Function should be implemented to log error in html
@@ -95,15 +97,15 @@
     // title: is a string
     // PosX and PosY:  is a number
     // type: should be specific strings ('todo','text','link')
-    // items: is a list of whatever you want
+    // items: is a list/array of whatever you want
     // also returns boxes
-    function addBox({
+    function addBox(
         title,
         posX,
         posY,
         type,
         items
-    }) {
+    ) {
         let boxes = []
 
         fetch("/add", {
@@ -112,8 +114,11 @@
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    title: title.value,
-                    description: description.value
+                    title,
+                    posX,
+                    posY,
+                    type,
+                    items
                 }),
             })
             .then((res) => res.json())
@@ -128,7 +133,7 @@
         return boxes
     }
 
-    // Function updates a box
+    // Function updates a box. use all params
     // Returns updated boxes
     function updateBox(
         _id,
@@ -147,7 +152,10 @@
                 body: JSON.stringify({
                     _id,
                     title,
-                    description
+                    posX,
+                    posY,
+                    type,
+                    items
                 }),
             })
             .then((res) => res.json())
