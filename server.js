@@ -11,8 +11,11 @@ const express = require("express"),
     port = process.env.PORT || 3000;
 
 const MONGO_URI = process.env.MONGO_URI;
+const MONG_CONFIG = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}
 
-const todo = [{ id: 0, text: "Do A3" }];
 app.set("trust proxy", 1);
 
 app.use(
@@ -45,14 +48,11 @@ passport.use(
             clientSecret: process.env.GIT_HUB_SECRET,
             callbackURL: process.env.GIT_HUB_CALLBACK,
         },
-        async(accessToken, refreshToken, profile, cb) => {
-            const client = new MongoClient(MONGO_URI, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-            });
+        async(accToken, refreshToken, profile, cb) => {
+            const client = new MongoClient(MONGO_URI, MONG_CONFIG);
 
             await client.connect();
-            const collection = client.db("A3_Data").collection("users");
+            const collection = client.db("t14-data").collection("users");
 
             const docs = await collection
                 .find({ username: profile.username })
@@ -84,18 +84,76 @@ app.get(
     }
 );
 
-app.get("/data", async(req, res) => {
+app.get("/settings", async(req, res) => {
+    if (!req.user) {
+        return res.json({ error: "User Not LoggedIn" })
+    }
+
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG)
+
+    await client.connect();
+    const collection = client.db("t14-data").collection("settings");
+
+    const docs = await collection.find({ user: req.user._id }).toArray();
+
+    await client.close();
+
+    return res.json(docs);
+});
+
+app.post("/updatesettings", bodyParser.json(), async(req, res) => {
     if (!req.user) {
         return res.json({ error: "Needs Login" });
     }
+    const newSettings = req.body;
 
-    const client = new MongoClient(MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
 
     await client.connect();
-    const collection = client.db("A3_Data").collection("todo");
+    const collection = client.db("t14-data").collection("settings");
+
+    const settings = await collection.find({ user: req.user._id }).toArray();
+
+    if (settings.length === 0) {
+
+        await collection.insertOne({
+            backgroundColor: newSettings.backgroundColor,
+            primaryColor: newSettings.primaryColor,
+            accentColor: newSettings.accentColor,
+            fontColor: newSettings.fontColor,
+            user: req.user._id
+        });
+
+    } else {
+        let _id = new mongodb.ObjectID(newItem._id);
+
+        await collection.updateOne({ user: req.user._id, _id }, {
+            $set: {
+                backgroundColor: newSettings.backgroundColor,
+                primaryColor: newSettings.primaryColor,
+                accentColor: newSettings.accentColor,
+                fontColor: newSettings.fontColor
+            }
+        })
+    }
+
+
+    const returnSettings = await collection.find({ user: req.user._id }).toArray()[0];
+    await client.close();
+
+    return res.json(returnSettings);
+});
+
+
+app.get("/data", async(req, res) => {
+    if (!req.user) {
+        return res.json({ error: "User Not LoggedIn" });
+    }
+
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
+
+    await client.connect();
+    const collection = client.db("t14-data").collection("boxes");
 
     const docs = await collection.find({ user: req.user._id }).toArray();
 
@@ -107,18 +165,15 @@ app.get("/data", async(req, res) => {
 
 app.post("/add", bodyParser.json(), async(req, res) => {
     if (!req.user) {
-        return res.json({ error: "Needs Login" });
+        return res.json({ error: "User Not LoggedIn" });
     }
     const newItem = req.body;
     console.log(newItem);
 
-    const client = new MongoClient(MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
 
     await client.connect();
-    const collection = client.db("A3_Data").collection("todo");
+    const collection = client.db("t14-data").collection("boxes");
 
     await collection.insertOne({...newItem, user: req.user._id });
 
@@ -130,24 +185,24 @@ app.post("/add", bodyParser.json(), async(req, res) => {
 
 app.post("/update", bodyParser.json(), async(req, res) => {
     if (!req.user) {
-        return res.json({ error: "Needs Login" });
+        return res.json({ error: "User Not LoggedIn" });
     }
     const newItem = req.body;
 
-    const client = new MongoClient(MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
 
     await client.connect();
-    const collection = client.db("A3_Data").collection("todo");
+    const collection = client.db("t14-data").collection("boxes");
 
     let _id = new mongodb.ObjectID(newItem._id);
 
     let result = await collection.updateOne({ user: req.user._id, _id }, {
         $set: {
             title: newItem.title,
-            description: newItem.description
+            posX: newItem.posX,
+            posY: newItem.posY,
+            type: newItem.type,
+            items: newItem.items
         }
     })
 
@@ -161,18 +216,15 @@ app.post("/update", bodyParser.json(), async(req, res) => {
 
 app.delete("/remove", bodyParser.json(), async(req, res) => {
     if (!req.user) {
-        return res.json({ error: "Needs Login" });
+        return res.json({ error: "User Not LoggedIn" });
     }
 
     let _id = new mongodb.ObjectID(req.body._id);
 
-    const client = new MongoClient(MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
 
     await client.connect();
-    const collection = client.db("A3_Data").collection("todo");
+    const collection = client.db("t14-data").collection("boxes");
 
     const { deletedCount } = await collection.deleteOne({
         _id,
