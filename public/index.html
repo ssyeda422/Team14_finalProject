@@ -1,198 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-</head>
+  </head>
 
-<body>
-    Hello world
-    <a href="/auth">LOGIN</a>
+  <body>
+    <div class="navbar">
+      <div class="dropdown" id="setMenu">
+        <button class="dropbtn">
+          <i class="fa fa-cog fa-lg"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="/auth">Log In</a>
+          <a href="#">Stuff</a>
+          <a href="#">More stuff</a>
+        </div>
+      </div>
 
-</body>
-<script>
-    window.onload = () => {}
+      <p class="greeting">
+        hello, world!
+      </p>
 
+      <div class="dropdown" id="addCat">
+        <button class="dropbtn">
+          Add Category
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="#">Text</a>
+          <a href="#">Todo</a>
+          <a href="#">Bookmarks</a>
+        </div>
+      </div>
+    </div>
+    <h1></h1>
+
+    <div id="picker"></div>
+    <button class="button" id="setbgcolor">
+      Set Color
+    </button>
+    <button class="button" id="reset">
+      Reset
+    </button>
+    
+    <!--Drag and drop API: https://api.jqueryui.com/draggable/-->
+    <div id="draggable" class="card">
+      <div class="container">
+        <h4><b>Card Title</b></h4>
+        <p>Card Text</p>
+      </div>
+    </div>
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+    window.onload = () => {};
+
+    var colorPicker = new iro.ColorPicker("#picker", {
+      width: 150
+    });
+
+    var body = document.querySelector("body");
+    var setbg = document.getElementById("setbgcolor");
+    var reset = document.getElementById("reset");
+
+    reset.onclick = function() {
+      body.style.backgroundColor = "white";
+    };
+
+    colorPicker.on("color:change", function(color) {
+      setbg.onclick = function() {
+        body.style.backgroundColor = colorPicker.color.hexString;
+      };
+    });
+
+    $(function() {
+      $("#draggable").draggable();
+    });
 
     // Function should be implemented to log error in html
     //Function runs when error occurs like user not being logged in
     function logError(error) {
-        console.warn(error) //place holder
+      console.warn(error); //place holder
     }
 
     // Function returns object of settings.
     // Empty if not logged in or settings dont exist
     function getSettings() {
-        let settings = {}
+      let settings = {};
 
-        fetch("/settings")
-            .then(res => res.json())
-            .then(json => {
-                if (!json.error) {
-                    settings = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/settings")
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            settings = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return settings
+      return settings;
     }
 
     //Function creates or updates settings also returns settings.
     // MUST include all params
     function createOrUpdateSettings(
-        backgroundColor,
-        primaryColor,
-        accentColor,
-        fontColor
+      backgroundColor,
+      primaryColor,
+      accentColor,
+      fontColor
     ) {
-        let settings = {}
+      let settings = {};
 
-        fetch("/updatesettings", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    backgroundColor,
-                    primaryColor,
-                    accentColor,
-                    fontColor
-                })
-            }).then(res => res.json())
-            .then(json => {
-                if (!json.error) {
-                    settings = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/updatesettings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          backgroundColor,
+          primaryColor,
+          accentColor,
+          fontColor
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            settings = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return settings
+      return settings;
     }
 
     // Function returns list of box objects.
     // Empty if not logged in or settings dont exist
     function getBoxes() {
-        let boxes = []
+      let boxes = [];
 
-        fetch("/data")
-            .then(res => res.json())
-            .then(json => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/data")
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return boxes
+      return boxes;
     }
 
-    // Function adds a box 
+    // Function adds a box
     // title: is a string
     // PosX and PosY:  is a number
     // type: should be specific strings ('todo','text','link')
     // items: is a list/array of whatever you want
     // also returns boxes
-    function addBox(
-        title,
-        posX,
-        posY,
-        type,
-        items
-    ) {
-        let boxes = []
+    function addBox(title, posX, posY, type, items) {
+      let boxes = [];
 
-        fetch("/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title,
-                    posX,
-                    posY,
-                    type,
-                    items
-                }),
-            })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title,
+          posX,
+          posY,
+          type,
+          items
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return boxes
+      //add the element to the page
+
+      return boxes;
     }
 
     // Function updates a box. use all params
     // Returns updated boxes
-    function updateBox(
-        _id,
-        title,
-        posX,
-        posY,
-        type,
-        items) {
-        let boxes = []
+    function updateBox(_id, title, posX, posY, type, items) {
+      let boxes = [];
 
-        fetch("/update", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    _id,
-                    title,
-                    posX,
-                    posY,
-                    type,
-                    items
-                }),
-            })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          _id,
+          title,
+          posX,
+          posY,
+          type,
+          items
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return boxes
+      return boxes;
     }
 
     //Function deletes entire box
     // also returns boxes
     function deleteBox(_id) {
-        let boxes = []
+      let boxes = [];
 
-        fetch("/remove", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    _id
-                }),
-            })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            });
+      fetch("/remove", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          _id
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return boxes;
+      return boxes;
     }
-</script>
-
+  </script>
 </html>

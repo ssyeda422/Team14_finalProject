@@ -22,8 +22,7 @@ app.use(
     session({
         secret: process.env.APP_SECRET,
         resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false },
+        saveUninitialized: false,
     })
 );
 
@@ -50,7 +49,7 @@ passport.use(
         },
         async(accToken, refreshToken, profile, cb) => {
             const client = new MongoClient(MONGO_URI, MONG_CONFIG);
-
+            console.log(profile)
             await client.connect();
             const collection = client.db("t14-data").collection("users");
 
