@@ -42,7 +42,7 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content accentElement" id="rightContent">
-          <a onclick="genTextCard('test', 'this is a test')">Text</a>
+          <a onclick="genTextCard('test', 'this is a test', 'fds8a89')">Text</a>
           <a onclick = "genToDoBox('todo', 'this is a test')">Todo</a>
           <a onclick = "genBookmarksBox('bookmarks', 'this is a test')">Bookmarks</a>
         </div>
@@ -359,14 +359,15 @@
     }
 
     //generates a new text card
-    function genTextCard(title, description){
+    function genTextCard(title, description, _id){
 
       const newDiv = document.createElement("div"); 
+      newDiv.id = _id
       newDiv.className = "card primaryElement";
 
       //var cards = document.getElementById("cards");
       newDiv.innerHTML += `
-          <div id="cardsheader">&nbsp;</div>
+          <div id="${_id}header">&nbsp;</div>
           <div class="container">
             <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
             <p contenteditable="true" class = "allText">${description}</p>
@@ -474,9 +475,9 @@ for(var i = 0; i < draggableElements.length; i++){
 
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById("cardsheader")) {
+  if (document.getElementById(`${elmnt.id}header`)) {
     // if present, the header is where you move the DIV from:
-    document.getElementById("cardsheader").onmousedown = dragMouseDown;
+    document.getElementById(`${elmnt.id}header`).onmousedown = dragMouseDown;
   } else {
     // otherwise, move the DIV from anywhere inside the DIV:
     elmnt.onmousedown = dragMouseDown;
