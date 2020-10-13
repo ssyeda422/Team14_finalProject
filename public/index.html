@@ -16,9 +16,9 @@
     <div class="navbar">
       <div class="dropdown" id="setMenu">
         <button class="dropbtn">
-          <i class="fa fa-cog fa-lg"></i>
+          <i class="fa fa-cog fa-lg allText"></i>
         </button>
-        <div class="dropdown-content">
+        <div class="dropdown-content accentElement">
           <a href="/auth">Log In</a>
           <a onclick = "showColorPicker(0)">
             Background Color
@@ -29,16 +29,16 @@
         </div>
       </div>
 
-      <p class="greeting">
+      <p class="greeting allText">
         hello, world!
       </p>
 
       <div class="dropdown" id="addCat">
-        <button class="dropbtn">
+        <button class="dropbtn allText">
           Add Category
           <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-content" id="rightContent">
+        <div class="dropdown-content accentElement" id="rightContent">
           <a onclick="genTextCard('test', 'this is a test')">Text</a>
           <a href="#">Todo</a>
           <a href="#">Bookmarks</a>
@@ -48,20 +48,19 @@
     <h1></h1>
     
     <!--Testing putting the picker in a card that toggles with the background color button -->
-    <div id = "bgColorCard" class = "card" hidden>
+    <div id = "bgColorCard" class = "card primaryElement" hidden>
       <div class = "container">
-        
-        <h4>
-          <button class="button" id="closeBtn" onclick = "hideColorPicker()">
+        <button class="button" id="closeBtn" onclick = "hideColorPicker()">
                 <i class="fa fa-times-circle fa-lg"></i>
               </button>
-          <b id = "colorPickerTitle">Set Background Color</b>
+        <h4>
+          <b id = "colorPickerTitle" class = "allText">Set Background Color</b>
           <p>
              <div id="picker"></div>
-              <button class="button" id="setbgcolor">
+              <button class="button accentElement" id="setbgcolor">
                 Set Color
               </button>
-              <button class="button" id="reset">
+              <button class="button accentElement" id="reset">
                 Reset
               </button>         
           </p>
@@ -70,18 +69,12 @@
     </div>
 
     <div id="cards">
-      <div class="card draggable">
-      <div content-editable="true" class="container">
-        <h4><b>Card Title</b></h4>
-        <p>Card Text</p>
+       <div class="card draggable primaryElement">
+        <div class="container">
+          <h4 contenteditable="true" class = "allText"><b>Card Title</b></h4>
+          <p contenteditable="true" class = "allText">Card Test</p>
+        </div>
       </div>
-    </div>
-    <div class="card draggable">
-      <div contenteditable="true" class="container">
-        <h4><b>Card Title</b></h4>
-        <p>Card Text</p>
-      </div>
-    </div>
   </div>
     <!--Drag and drop API: https://api.jqueryui.com/draggable/-->
     
@@ -89,10 +82,10 @@
   </body>
 
   <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
     window.onload = () => {};
+    
+
     
     var pickerType = 0; //variable stores what kind of color picker to display. 0=background 1=primary 2=accent 3=text
 
@@ -113,7 +106,7 @@
             break;
           case 1:
             //primary
-            var elem = document.getElementsByClassName("card draggable");          
+            var elem = document.getElementsByClassName("primaryElement");          
             for (var i = 0; i < elem.length; i++){
               elem[i].style.backgroundColor = "white";
             }
@@ -127,9 +120,9 @@
             break;
           case 3:
             //text
-            var elem = document.getElementsByClassName("card draggable");          
+            var elem = document.getElementsByClassName("allText");          
             for (var i = 0; i < elem.length; i++){
-              elem[i].style.color = "white";
+              elem[i].style.color = "black";
             }
             break;
         }  
@@ -145,7 +138,7 @@
             break;
           case 1:
             //primary
-            var elem = document.getElementsByClassName("card draggable");          
+            var elem = document.getElementsByClassName("primaryElement");          
             for (var i = 0; i < elem.length; i++){
               elem[i].style.backgroundColor = colorPicker.color.hexString;
             }
@@ -159,7 +152,7 @@
             break;
           case 3:
             //text
-            var elem = document.getElementsByClassName("card draggable");          
+            var elem = document.getElementsByClassName("allText");          
             for (var i = 0; i < elem.length; i++){
               elem[i].style.color = colorPicker.color.hexString;
             }
@@ -167,10 +160,6 @@
         }      
         
       };
-    });
-
-    $(function() {
-       $(".draggable").draggable({zIndex: -1});
     });
 
     // Function should be implemented to log error in html
@@ -366,12 +355,18 @@
       cards.innerHTML += `
         <div class="card draggable">
           <div class="container">
-            <h4 contenteditable="true" ><b>${title}</b></h4>
-            <p contenteditable="true" >${description}</p>
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <p contenteditable="true" class = "allText">${description}</p>
           </div>
         </div>
         `;
-    }
+      
+      //dummy values for posX and posY for now
+      addBox(title, 0, 0, "Text", description);
+    
+  }
+    
+  
     
     function genToDoBox(title, items){
       // to be finished later
