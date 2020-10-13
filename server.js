@@ -22,8 +22,7 @@ app.use(
     session({
         secret: process.env.APP_SECRET,
         resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false },
+        saveUninitialized: false,
     })
 );
 
@@ -50,7 +49,7 @@ passport.use(
         },
         async(accToken, refreshToken, profile, cb) => {
             const client = new MongoClient(MONGO_URI, MONG_CONFIG);
-
+            console.log(profile)
             await client.connect();
             const collection = client.db("t14-data").collection("users");
 
@@ -98,7 +97,7 @@ app.get("/settings", async(req, res) => {
 
     await client.close();
 
-    return res.json(docs.length === 0 ? {} : docs[0]);
+    return res.json(docs.length === 0 ? {} : {...docs[0], username: req.user.username });
 });
 
 app.post("/updatesettings", bodyParser.json(), async(req, res) => {
@@ -141,7 +140,7 @@ app.post("/updatesettings", bodyParser.json(), async(req, res) => {
 
     await client.close();
 
-    return res.json(returnSettings[0]);
+    return res.json({...returnSettings[0], username: req.user.username });
 });
 
 

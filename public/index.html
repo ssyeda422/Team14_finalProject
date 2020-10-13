@@ -1,198 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-</head>
+  </head>
 
-<body>
-    Hello world
-    <a href="/auth">LOGIN</a>
+  <body>
+    <div class="navbar">
+      <div class="dropdown" id="setMenu">
+        <button class="dropbtn">
+          <i class="fa fa-cog fa-lg allText"></i>
+        </button>
+        <div class="dropdown-content accentElement">
+          <a href="/auth">Log In</a>
+          <a onclick = "showColorPicker(0)">
+            Background Color
+          </a>
+          <a onclick = "showColorPicker(1)">Primary Color</a>
+          <a onclick = "showColorPicker(2)">Accent Color</a>
+          <a onclick = "showColorPicker(3)">Text Color</a>
+        </div>
+      </div>
 
-</body>
-<script>
-    window.onload = () => {}
+      <p class="greeting allText">
+        hello, world!
+      </p>
 
+      <div class="dropdown" id="addCat">
+        <button class="dropbtn allText">
+          Add Category
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content accentElement" id="rightContent">
+          <a onclick="genTextCard('test', 'this is a test')">Text</a>
+          <a href="#">Todo</a>
+          <a href="#">Bookmarks</a>
+        </div>
+      </div>
+    </div>
+    <h1></h1>
+    
+    <!--Testing putting the picker in a card that toggles with the background color button -->
+    <div id = "bgColorCard" class = "card primaryElement" hidden>
+      <div class = "container">
+        <button class="button" id="closeBtn" onclick = "hideColorPicker()">
+                <i class="fa fa-times-circle fa-lg"></i>
+              </button>
+        <h4>
+          <b id = "colorPickerTitle" class = "allText">Set Background Color</b>
+          <p>
+             <div id="picker"></div>
+              <button class="button accentElement" id="setbgcolor">
+                Set Color
+              </button>
+              <button class="button accentElement" id="reset">
+                Reset
+              </button>         
+          </p>
+        </h4>
+      </div>
+    </div>
+
+    <div id="cards">
+       <div class="card draggable primaryElement">
+        <div class="container">
+          <h4 contenteditable="true" class = "allText"><b>Card Title</b></h4>
+          <p contenteditable="true" class = "allText">Card Test</p>
+        </div>
+      </div>
+  </div>
+    <!--Drag and drop API: https://api.jqueryui.com/draggable/-->
+    
+  
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+  <script>
+    window.onload = () => {};
+    
+
+    
+    var pickerType = 0; //variable stores what kind of color picker to display. 0=background 1=primary 2=accent 3=text
+
+    var colorPicker = new iro.ColorPicker("#picker", {
+      width: 150
+    });
+
+    var body = document.querySelector("body");
+    var setbg = document.getElementById("setbgcolor");
+    var reset = document.getElementById("reset");
+
+    reset.onclick = function() {
+    
+      switch(pickerType){
+          case 0:
+            //background
+            body.style.backgroundColor = "white";
+            break;
+          case 1:
+            //primary
+            var elem = document.getElementsByClassName("primaryElement");          
+            for (var i = 0; i < elem.length; i++){
+              elem[i].style.backgroundColor = "white";
+            }
+            break;
+          case 2:
+            //accent
+             var elem = document.getElementsByClassName("accentElement");          
+            for (var i = 0; i < elem.length; i++){
+              elem[i].style.backgroundColor = "white";
+            }
+            break;
+          case 3:
+            //text
+            var elem = document.getElementsByClassName("allText");          
+            for (var i = 0; i < elem.length; i++){
+              elem[i].style.color = "black";
+            }
+            break;
+        }  
+    };
+
+    colorPicker.on("color:change", function(color) {
+      setbg.onclick = function() {
+  
+        switch(pickerType){
+          case 0:
+            //background
+            body.style.backgroundColor = colorPicker.color.hexString;
+            break;
+          case 1:
+            //primary
+            var elem = document.getElementsByClassName("primaryElement");          
+            for (var i = 0; i < elem.length; i++){
+              elem[i].style.backgroundColor = colorPicker.color.hexString;
+            }
+            break;
+          case 2:
+            //accent
+            var elem = document.getElementsByClassName("accentElement");          
+            for (var i = 0; i < elem.length; i++){
+              elem[i].style.backgroundColor = colorPicker.color.hexString;
+            }
+            break;
+          case 3:
+            //text
+            var elem = document.getElementsByClassName("allText");          
+            for (var i = 0; i < elem.length; i++){
+              elem[i].style.color = colorPicker.color.hexString;
+            }
+            break;
+        }      
+        
+      };
+    });
 
     // Function should be implemented to log error in html
     //Function runs when error occurs like user not being logged in
     function logError(error) {
-        console.warn(error) //place holder
+      console.warn(error); //place holder
     }
 
     // Function returns object of settings.
     // Empty if not logged in or settings dont exist
     function getSettings() {
-        let settings = {}
+      let settings = {};
 
-        fetch("/settings")
-            .then(res => res.json())
-            .then(json => {
-                if (!json.error) {
-                    settings = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/settings")
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            settings = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return settings
+      return settings;
     }
 
     //Function creates or updates settings also returns settings.
     // MUST include all params
     function createOrUpdateSettings(
-        backgroundColor,
-        primaryColor,
-        accentColor,
-        fontColor
+      backgroundColor,
+      primaryColor,
+      accentColor,
+      fontColor
     ) {
-        let settings = {}
+      let settings = {};
 
-        fetch("/updatesettings", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    backgroundColor,
-                    primaryColor,
-                    accentColor,
-                    fontColor
-                })
-            }).then(res => res.json())
-            .then(json => {
-                if (!json.error) {
-                    settings = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/updatesettings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          backgroundColor,
+          primaryColor,
+          accentColor,
+          fontColor
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            settings = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return settings
+      return settings;
     }
 
     // Function returns list of box objects.
     // Empty if not logged in or settings dont exist
     function getBoxes() {
-        let boxes = []
+      let boxes = [];
 
-        fetch("/data")
-            .then(res => res.json())
-            .then(json => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            })
-
-        return boxes
+      fetch("/data")
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
+      loadBoxesToPage(boxes);
+      return boxes;
     }
 
-    // Function adds a box 
+    // Function adds a box
     // title: is a string
     // PosX and PosY:  is a number
     // type: should be specific strings ('todo','text','link')
     // items: is a list/array of whatever you want
     // also returns boxes
-    function addBox(
-        title,
-        posX,
-        posY,
-        type,
-        items
-    ) {
-        let boxes = []
+    function addBox(title, posX, posY, type, items) {
+      let boxes = [];
 
-        fetch("/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title,
-                    posX,
-                    posY,
-                    type,
-                    items
-                }),
-            })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            })
+      fetch("/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title,
+          posX,
+          posY,
+          type,
+          items
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
 
-        return boxes
+      //add the element to the page
+      loadBoxesToPage(boxes);
+      return boxes;
     }
 
     // Function updates a box. use all params
     // Returns updated boxes
-    function updateBox(
-        _id,
-        title,
-        posX,
-        posY,
-        type,
-        items) {
-        let boxes = []
+    function updateBox(_id, title, posX, posY, type, items) {
+      let boxes = [];
 
-        fetch("/update", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    _id,
-                    title,
-                    posX,
-                    posY,
-                    type,
-                    items
-                }),
-            })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            })
-
-        return boxes
+      fetch("/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          _id,
+          title,
+          posX,
+          posY,
+          type,
+          items
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
+      loadBoxesToPage(boxes);
+      return boxes;
     }
 
     //Function deletes entire box
     // also returns boxes
     function deleteBox(_id) {
-        let boxes = []
+      let boxes = [];
 
-        fetch("/remove", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    _id
-                }),
-            })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.error) {
-                    boxes = json
-                } else {
-                    logError(json.error)
-                }
-            });
-
-        return boxes;
+      fetch("/remove", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          _id
+        })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (!json.error) {
+            boxes = json;
+          } else {
+            logError(json.error);
+          }
+        });
+      loadBoxesToPage(boxes);
+      return boxes;
     }
-</script>
+    
+    function loadBoxesToPage(boxes){
+      const tempBoxes = boxes;
+      tempBoxes.forEach(box => {
+        if (box.type === 'text'){
+          genTextBox(box.title, box.items);
+        }
+        else if (box.type === 'todo'){
+          genToDoBox(box.title, box.items);
+        }
+        else if (box.type === 'link'){
+          genBookmarksBox(box.title, box.items);
+        }
+        else {
+          console.log("invalid box type. cannot generate box");
+        }
+      });
+    }
 
+    //generates a new text card
+    function genTextBox(title, description){
+      var cards = document.getElementById("cards");
+      cards.innerHTML += `
+        <div class="card draggable">
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <p contenteditable="true" class = "allText">${description}</p>
+          </div>
+        </div>
+        `;
+      
+      //dummy values for posX and posY for now
+      addBox(title, 0, 0, "Text", description);
+    
+  }
+    
+  
+    
+    function genToDoBox(title, items){
+      // to be finished later
+    }
+    
+    function genBookmarksBox(title, link){
+      var cards = document.getElementById("cards");
+      cards.innerHTML += `
+        <div class="card draggable">
+          <div class="container">
+            <a href="${link}" ><b>${title}</b></h4>
+          </div>
+        </div>
+        `;
+    }
+    
+    //hide and show the color picker
+    function showColorPicker(type){
+      //set the type of the color picker
+      pickerType = type;
+      var elem = document.getElementById("bgColorCard");
+      //also should change the name of the picker
+      var title = document.getElementById("colorPickerTitle");
+      switch(pickerType){
+        case 0:
+          //background
+          title.innerHTML = "Set Background Color";
+          break;
+        case 1:
+          //card
+          title.innerHTML = "Set Primary Color";
+          break;
+        case 2:
+          //accent elements
+          title.innerHTML = "Set Accent Color";
+          break;
+        case 3:
+          //text
+          title.innerHTML = "Set Text Color";
+          break;
+      }
+          
+      elem.hidden = false;
+    }
+    
+    function hideColorPicker(){
+      var elem = document.getElementById("bgColorCard");
+      elem.hidden = true;
+    }
+  </script>
 </html>
