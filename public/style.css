@@ -96,7 +96,7 @@ img{
 }
 
 /* Dropdown button */
-.dropdown .dropbtn{
+.dropdown .dropbtn, .saveBtn{
   font-size: 16px;
   border: none;
   outline: none;
@@ -155,6 +155,8 @@ img{
   width: 150px;
   height: 200px;
   resize: both;
+  position: absolute;
+  z-index: 9;
   overflow: auto;
   margin-top: 0%;
   border-radius: 5px;
@@ -262,21 +264,17 @@ h5 {
 h6 {
   font-size: 1em; }
 
-#card {
-  position: relative;
-  z-index: -5;
-
-}
-
 small, sub, sup {
   font-size: 75%; }
 
 hr {
   border-color: #1d7484; }
 
-a, .backgroundBtn, {
+a, .backgroundBtn {
   text-decoration: none;
-  color: #1d7484; }
+  color: #1d7484;
+ }
+
   a:hover {
     color: #982c61;
     border-bottom: 2px solid #4a4a4a; }
@@ -289,7 +287,9 @@ ul {
   margin-bottom: 2.5rem; }
 
 li {
-  margin-bottom: 0.4em; }
+  margin-bottom: 0.4em;
+  color: black;
+}
 
 blockquote {
   margin-left: 0px;
@@ -417,24 +417,23 @@ footer {
   font-size: 12px;
 }
 
-
-
-
-
-
-
-#cards {
-  position: absolute;
-  z-index: 9;
-  background-color: #f1f1f1;
-  border: 1px solid #d3d3d3;
-  text-align: center;
-}
-
 #cardsheader {
   padding: 0px;
   cursor: move;
-  z-index: 10;
   color: black;
+  z-index: 10;
   background-color: #d3d3d3;
+}
+
+
+/* The sticky class is added to the navbar with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+/* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
+.sticky + .content {
+  padding-top: 60px;
 }
