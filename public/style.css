@@ -152,14 +152,14 @@ img{
   /* Add shadows to create the "card" effect */
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   transition: 0.05s;
-  width: 120px;
-  height: 170px;
+  width: 150px;
+  height: 200px;
   resize: both;
   overflow: auto;
   margin-top: 0%;
   border-radius: 5px;
   background-color: white;
-  padding: 3px 10px;
+  
 }
 
 #bgColorCard{
@@ -190,7 +190,7 @@ img{
 
 /* Add some padding inside the card container */
 .container {
-  padding: 8px;
+  padding-bottom: 40px;
   position: absolute;
   z-index: 3;
 
@@ -415,4 +415,26 @@ footer {
   padding-top: 1em;
   border-top: 1px solid lightgrey;
   font-size: 12px;
+}
+
+
+
+
+
+
+
+#cards {
+  position: absolute;
+  z-index: 9;
+  background-color: #f1f1f1;
+  border: 1px solid #d3d3d3;
+  text-align: center;
+}
+
+#cardsheader {
+  padding: 0px;
+  cursor: move;
+  z-index: 10;
+  color: black;
+  background-color: #d3d3d3;
 }
