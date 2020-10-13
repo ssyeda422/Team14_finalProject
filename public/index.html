@@ -245,7 +245,7 @@
             logError(json.error);
           }
         });
-
+      loadBoxesToPage(boxes);
       return boxes;
     }
 
@@ -281,7 +281,7 @@
         });
 
       //add the element to the page
-
+      loadBoxesToPage(boxes);
       return boxes;
     }
 
@@ -312,7 +312,7 @@
             logError(json.error);
           }
         });
-
+      loadBoxesToPage(boxes);
       return boxes;
     }
 
@@ -338,12 +338,30 @@
             logError(json.error);
           }
         });
-
+      loadBoxesToPage(boxes);
       return boxes;
     }
     
+    function loadBoxesToPage(boxes){
+      const tempBoxes = boxes;
+      tempBoxes.forEach(box => {
+        if (box.type === 'text'){
+          genTextBox(box.title, box.items);
+        }
+        else if (box.type === 'todo'){
+          genToDoBox(box.title, box.items);
+        }
+        else if (box.type === 'link'){
+          genBookmarksBox(box.title, box.items);
+        }
+        else {
+          console.log("invalid box type. cannot generate box");
+        }
+      });
+    }
+
     //generates a new text card
-    function genTextCard(title, description){
+    function genTextBox(title, description){
       var cards = document.getElementById("cards");
       cards.innerHTML += `
         <div class="card draggable">
@@ -355,11 +373,11 @@
         `;
     }
     
-    function genToDoCard(){
+    function genToDoBox(title, items){
       // to be finished later
     }
     
-    function genBookmarksCard(title, link){
+    function genBookmarksBox(title, link){
       var cards = document.getElementById("cards");
       cards.innerHTML += `
         <div class="card draggable">
