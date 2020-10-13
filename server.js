@@ -97,7 +97,7 @@ app.get("/settings", async(req, res) => {
 
     await client.close();
 
-    return res.json(docs.length === 0 ? {} : docs[0]);
+    return res.json(docs.length === 0 ? {} : {...docs[0], username: req.user.username });
 });
 
 app.post("/updatesettings", bodyParser.json(), async(req, res) => {
@@ -140,7 +140,7 @@ app.post("/updatesettings", bodyParser.json(), async(req, res) => {
 
     await client.close();
 
-    return res.json(returnSettings[0]);
+    return res.json({...returnSettings[0], username: req.user.username });
 });
 
 

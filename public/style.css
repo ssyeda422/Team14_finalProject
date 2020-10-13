@@ -60,14 +60,19 @@ img{
 .greeting{
   margin-top: 15px;
   margin-left: 5.75%;
-  color: white;
+  color: black;
   font-weight: bold;
+}
+
+.fa-cog{
+  color:black;
 }
 
 /* Navbar container */
 .navbar {
   overflow: hidden;
-  background-color: #40596B;
+  backdrop-filter: "blur(10px)";
+  background-color: rgba(255, 255, 255, 0.3);
   display:flex;
   justify-content: space-between;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -95,7 +100,7 @@ img{
   font-size: 16px;
   border: none;
   outline: none;
-  color: white;
+  color: black;
   padding: 20px 16px;
   background-color: inherit;
   font-family: inherit; /* Important for vertical align on mobile phones */
@@ -116,6 +121,10 @@ img{
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
+}
+
+#rightContent{
+  right:0;
 }
 
 /* Links inside the dropdown */
@@ -150,6 +159,31 @@ img{
   padding: 3px 10px;
 }
 
+#bgColorCard{
+  width: 300px;
+  height: 500px;
+}
+
+.draggable {
+  position: absolute;
+  z-index: -3;
+}
+
+#setbgcolor, #reset{
+  width: 150px;
+  margin:auto;
+  margin-top: 10px;
+}
+
+#closeBtn, #cardCloseBtn{
+  background-color: transparent;
+  width:40px;
+}
+
+.fa-times-circle{
+  color: black;
+}
+
 /* On mouse-over, add a deeper shadow */
 .card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
@@ -158,6 +192,7 @@ img{
 /* Add some padding inside the card container */
 .container {
   padding: 8px;
+  position: absolute;
 }
 
 
@@ -234,7 +269,7 @@ small, sub, sup {
 hr {
   border-color: #1d7484; }
 
-a {
+a, .backgroundBtn, {
   text-decoration: none;
   color: #1d7484; }
   a:hover {
