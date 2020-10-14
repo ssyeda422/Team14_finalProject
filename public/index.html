@@ -42,9 +42,9 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content accentElement" id="rightContent">
-          <a onclick="genTextCard('test', 'this is a test', 'fds8a89')">Text</a>
-          <a onclick = "genToDoBox('todo', 'this is a test')">Todo</a>
-          <a onclick = "genBookmarksBox('bookmarks', 'this is a test')">Bookmarks</a>
+          <a onclick="genNewTextCard('test', 'this is a test')">Text</a>
+          <a onclick = "genNewToDoBox('todo', 'this is a test')">Todo</a>
+          <a onclick = "genNewBookmarksBox('bookmarks', 'this is a test')">Bookmarks</a>
         </div>
       </div>
     </div>
@@ -252,7 +252,7 @@
     // type: should be specific strings ('todo','text','link')
     // items: is a list/array of whatever you want
     // also returns boxes
-    function addBox(title, posX, posY, type, items) {
+    function addBox(_id, title, posX, posY, type, items) {
       let boxes = [];
 
       fetch("/add", {
@@ -261,6 +261,7 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          _id,
           title,
           posX,
           posY,
@@ -278,7 +279,7 @@
         });
 
       //add the element to the page
-      loadBoxesToPage(boxes);
+      //loadBoxesToPage(boxes);
       return boxes;
     }
 
@@ -310,7 +311,7 @@
             logError(json.error);
           }
         });
-      loadBoxesToPage(boxes);
+      //loadBoxesToPage(boxes);
       return boxes;
     }
 
@@ -336,21 +337,22 @@
             logError(json.error);
           }
         });
-      loadBoxesToPage(boxes);
+      //loadBoxesToPage(boxes);
       return boxes;
     }
     
+    // loads boxes from database onto page
     function loadBoxesToPage(boxes){
       const tempBoxes = boxes;
       tempBoxes.forEach(box => {
         if (box.type === 'text'){
-          genTextBox(box.title, box.items);
+          genOldTextBox(box.title, box.items, box._id);
         }
         else if (box.type === 'todo'){
-          genToDoBox(box.title, box.items);
+          genOldToDoBox(box.title, box.items, box._id);
         }
         else if (box.type === 'link'){
-          genBookmarksBox(box.title, box.items);
+          genOldBookmarksBox(box.title, box.items, box._id);
         }
         else {
           console.log("invalid box type. cannot generate box");
@@ -358,11 +360,16 @@
       });
     }
 
-    //generates a new text card
-    function genTextCard(title, description, _id){
+    // generates a random ID value to identify different boxes
+    function genIDValue(){
+      return Math.random().toString(36).substr(2, 9)
+    }
 
+    //generates a new Text card that's not in the database
+    function genNewTextCard(title, description){
+      var _id = genIDValue();
       const newDiv = document.createElement("div"); 
-      newDiv.id = _id
+      newDiv.id = _id;
       newDiv.className = "card primaryElement";
 
       //var cards = document.getElementById("cards");
@@ -383,11 +390,34 @@
     
   }
     
-  
+  function genOldTextCard(title, description, _id){
+      const newDiv = document.createElement("div"); 
+      newDiv.id = _id;
+      newDiv.className = "card primaryElement";
+
+      //var cards = document.getElementById("cards");
+      newDiv.innerHTML += `
+          <div id="${_id}header">&nbsp;</div>
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <p contenteditable="true" class = "allText">${description}</p>
+          </div>
+        `;
+
+
+      dragElement(newDiv);
+      document.body.appendChild(newDiv); 
+      
+      //dummy values for posX and posY for now
+      //addBox(title, 0, 0, "Text", description); <- don't need this if we wanna generate a box that already exists in the database
     
-    function genToDoBox(title, items){
+  }
+    
+    function genNewToDoBox(title, items){
       // to be finished later
+      var _id = genIDValue();
       const newToDo = document.createElement("div"); 
+      newToDo.id = _id;
       newToDo.className = "card primaryElement";
 
       //var cards = document.getElementById("cards");
@@ -406,9 +436,34 @@
       //dummy values for posX and posY for now
       addBox(title, 0, 0, "ToDo", items);
     }
+
+    function genOldToDoBox(title, items, _id){
+      // to be finished later
+      const newToDo = document.createElement("div"); 
+      newToDo.id = _id;
+      newToDo.className = "card primaryElement";
+
+      //var cards = document.getElementById("cards");
+      newToDo.innerHTML += `
+          <div id="cardsheader">&nbsp;</div>
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <ul contenteditable="true" class = "allText"><li>${items}<li></ul>
+          </div>
+        `;
+
+
+      dragElement(newToDo);
+      document.body.appendChild(newToDo); 
+      
+      //dummy values for posX and posY for now
+      //addBox(title, 0, 0, "ToDo", items);
+    }
     
-    function genBookmarksBox(title, link){
+    function genNewBookmarksBox(title, link){
+      var _id = genIDValue();
       const newDiv = document.createElement("div"); 
+      newDiv.id = _id;
       newDiv.className = "card primaryElement";
 
       //var cards = document.getElementById("cards");
@@ -426,6 +481,28 @@
       
       //dummy values for posX and posY for now
       addBox(title, 0, 0, "Bookmarks", link);
+    }
+
+    function genOldBookmarksBox(title, link, _id){
+      const newDiv = document.createElement("div"); 
+      newDiv.id = _id;
+      newDiv.className = "card primaryElement";
+
+      //var cards = document.getElementById("cards");
+      newDiv.innerHTML += `
+          <div id="cardsheader">&nbsp;</div>
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <ul> <li class = "allText">${link}</li></ul>
+          </div>
+        `;
+
+
+      dragElement(newDiv);
+      document.body.appendChild(newDiv); 
+      
+      //dummy values for posX and posY for now
+      //addBox(title, 0, 0, "Bookmarks", link);
     }
     
     //hide and show the color picker
