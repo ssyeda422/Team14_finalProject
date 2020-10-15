@@ -167,6 +167,8 @@ app.post("/add", bodyParser.json(), async(req, res) => {
         return res.json({ error: "User Not LoggedIn" });
     }
     const newItem = req.body;
+    console.log('ID:' + newItem._id)
+    newItem._id = new mongodb.ObjectID(newItem._id)
     console.log(newItem);
 
     const client = new MongoClient(MONGO_URI, MONG_CONFIG);
@@ -193,7 +195,7 @@ app.post("/update", bodyParser.json(), async(req, res) => {
     await client.connect();
     const collection = client.db("t14-data").collection("boxes");
 
-    let _id = new mongodb.ObjectID(newItem._id);
+    let _id = newItem._id.length === 24 ? new mongodb.ObjectID(newItem._id) : newItem._id;
 
     let result = await collection.updateOne({ user: req.user._id, _id }, {
         $set: {
