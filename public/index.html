@@ -43,7 +43,7 @@
                 <div class="dropdown-content accentElement" id="rightContent">
                     <a onclick="genNewTextCard('test', 'this is a test')">Text</a>
                     <a onclick="genNewToDoBox('todo', 'this is a test')">Todo</a>
-                    <a onclick="genNewBookmarksBox('bookmarks', ['www.google.com', 'www.wpi.edu'])">Bookmarks</a>
+                    <a onclick="genNewBookmarksBox('bookmarks', ['www.google.com', 'www.wpi.edu'],0,0,true)">Bookmarks</a>
                 </div>
             </div>
         </div>
@@ -359,9 +359,37 @@
                     logError(json.error);
                 }
             });
-        //loadBoxesToPage(boxes);
+
         return boxes;
     }
+
+    function updateBoxPos(_id, posY, posX) {
+        let boxes = [];
+
+        fetch("/updateBoxPos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    _id,
+                    posX,
+                    posY,
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json;
+                } else {
+                    logError(json.error);
+                }
+            });
+
+
+        return boxes;
+    }
+
 
     function deleteCard(id) {
         deleteBox(id);
@@ -407,7 +435,7 @@
             } else if (box.type === 'todo') {
                 // genOldToDoBox(box.title, box.items, box._id);
             } else if (box.type === 'Bookmarks') {
-                genNewBookmarksBox(box.title, box.items);
+                genNewBookmarksBox(box.title, box.items, box.posY, box.posX, false, box._id);
             } else {
                 console.log("invalid box type. cannot generate box");
             }
@@ -564,8 +592,9 @@
         //addBox(title, 0, 0, "ToDo", items);
     }
 
-    function genNewBookmarksBox(title, links) {
-        var _id = genIDValue();
+
+    function genNewBookmarksBox(title, links, y, x, saveToDatabase, id) {
+        var _id = id ? id : genIDValue();
         const newDiv = document.createElement("div");
         document.body.appendChild(newDiv);
         newDiv.id = _id;
@@ -573,8 +602,11 @@
         var idName = String(_id + "header");
         console.log(idName);
         console.log(links);
-
-        //var cards = document.getElementById("cards");
+        console.log(y)
+        newDiv.style.top = y + 'px'
+        newDiv.style.left = x + 'px'
+        console.log(newDiv.style.top)
+            //var cards = document.getElementById("cards");
         newDiv.innerHTML += `
           <div id="${idName}" class ="accentElement" style="padding: 0px;
                                   cursor: move;
@@ -636,8 +668,16 @@
 
         });
 
-        //dummy values for posX and posY for now
-        addBox(_id, title, 0, 0, "Bookmarks", links);
+
+
+        if (saveToDatabase) {
+
+            let newY = newDiv.style.top ? newDiv.style.top.replace('px', '') : 0
+            let newX = newDiv.style.left ? newDiv.style.left.replace('px', '') : 0
+
+
+            addBox(_id, title, newX, newY, "Bookmarks", links);
+        }
     }
 
     // takes the list elmnt and list of links and adds the links as 
@@ -790,6 +830,9 @@
             // stop moving when mouse button is released:
             document.onmouseup = null;
             document.onmousemove = null;
+            updateBoxPos(elmnt.id,
+                elmnt.style.top.replace('px', ''),
+                elmnt.style.left.replace('px', ''))
         }
     }
 </script>

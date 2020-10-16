@@ -215,6 +215,38 @@ app.post("/update", bodyParser.json(), async(req, res) => {
     return res.json(todos);
 })
 
+app.post("/updateBoxPos", bodyParser.json(), async(req, res) => {
+    if (!req.user) {
+        return res.json({ error: "User Not LoggedIn" });
+    }
+    const newItem = req.body;
+
+    if (!newItem.posX || !newItem.posY || !newItem._id) {
+        return res.json({ error: "Must include id and coord positions" })
+    }
+
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
+
+    await client.connect();
+    const collection = client.db("t14-data").collection("boxes");
+
+    let _id = new mongodb.ObjectID(newItem._id)
+
+    let result = await collection.updateOne({ user: req.user._id, _id }, {
+        $set: {
+            posX: newItem.posX,
+            posY: newItem.posY,
+        }
+    })
+
+    console.log(result.modifiedCount)
+
+    const todos = await collection.find({ user: req.user._id }).toArray();
+    await client.close();
+
+    return res.json(todos);
+})
+
 app.delete("/remove", bodyParser.json(), async(req, res) => {
     if (!req.user) {
         return res.json({ error: "User Not LoggedIn" });
