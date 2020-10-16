@@ -28,8 +28,8 @@
             </div>
         </div>
 
-        <p class="greeting allText">
-            Hello, [user]!
+        <p class="greeting allText" id = "userGreeting">
+            Please log in.
         </p>
         <div>
             <button id="saveBtn" class="saveBtn allText" onclick="saveColors()"> <!--to be implemented onclick, should save all changes and send to database--->
@@ -42,7 +42,7 @@
         </button>
                 <div class="dropdown-content accentElement" id="rightContent">
                     <a onclick="genNewTextCard('test', 'this is a test')">Text</a>
-                    <a onclick="genNewToDoBox('todo', 'this is a test')">Todo</a>
+                    <a onclick="genNewToDoBox('todo', [{'name' : 'fix all this', 'checked' : 'false'}])">Todo</a>
                     <a onclick="genNewBookmarksBox('bookmarks', ['www.google.com', 'www.wpi.edu'],0,0,true)">Bookmarks</a>
                 </div>
             </div>
@@ -209,6 +209,9 @@
             textElem[i].style.color = settings.fontColor;
         }
 
+        //change the greeting to say Hello, [USER]
+        var elem = document.getElementById("userGreeting");
+        elem.innerHTML = `Hello, ${settings.username}!`;
     }
 
     // Function should be implemented to log error in html
@@ -536,24 +539,31 @@
         }
     }
 
-    function genNewToDoBox(title, items) {
-        // to be finished later
-        var _id = genIDValue();
+    function genNewToDoBox(title, items, y, x, saveToDatabase, id) {
+        var _id = id ? id : genIDValue();
         const newToDo = document.createElement("div");
         document.body.appendChild(newToDo);
         newToDo.id = _id;
         newToDo.className = "card primaryElement";
-
+        var idName = String(_id + "header");
+        console.log(idName);
+        console.log(items);
+        console.log(y)
+        newToDo.style.top = y + 'px'
+        newToDo.style.left = x + 'px'
+        console.log(newToDo.style.top)
         //var cards = document.getElementById("cards");
         newToDo.innerHTML += `
-          <div id="${_id}header" class = "accentElement" style="padding: 0px;
+          <div id="${idName}" class = "accentElement" style="padding: 0px;
                                   cursor: move;
                                   color: black;
                                   z-index: 10;
                                   background-color: #d3d3d3;">&nbsp;</div>
           <div class="container">
             <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
-            <ul contenteditable="true" class = "allText"><li>${items}<li></ul>
+            <ul id="${_id}ToDos">
+                
+                </ul>
           </div>
           <button class="button allText cardSaveBtn" onclick="updateCard('${_id}', '${title}', 'ToDo', '${items}')">
               <i class="fa fa-save fa-lg"></i>
@@ -565,7 +575,25 @@
 
 
         dragElement(newToDo);
+        var newUL = document.getElementById(`${_id}ToDos`);
+        items.forEach(item => {
+            var newli = document.createElement('li');
+            var newcb = document.createElement('input');
+            newcb.setAttribute('id', `${item.name}li`);
+            newcb.setAttribute('type', "checkbox");
+            if (item.checked === 'false'){
+                newcb.checked = false;
+            } else {
+                newcb.checked = true;
+            }
+            newcb.setAttribute('value', item.name);
+            var newlabel = document.createElement('label');
+            newlabel.innerText = item.name;
 
+            newli.appendChild(newcb);
+            newli.appendChild(newlabel);
+            newUL.appendChild(newli);
+        });
 
         //dummy values for posX and posY for now
         addBox(_id, title, 0, 0, "ToDo", items);
@@ -618,7 +646,7 @@
           <div class="container">
             <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
             <ul id="${_id}Bookmarks">
-              <li>Test</li>
+              
               </ul>
           </div>
           <button class="button allText cardSaveBtn" onclick="updateCard('${_id}', '${title}', 'Bookmarks', 'Card Test')">
@@ -634,14 +662,9 @@
         links.forEach(link => {
             var newli = document.createElement('li');
             var newlink = document.createElement('a');
-            //var tempID = newlink.getAttribute('id');
-            //var tempCE = newlink.getAttribute('contenteditable');
-            //var tempHR = newlink.getAttribute('href');
             newlink.setAttribute('id', `${link}li`);
             newlink.setAttribute('contenteditable', 'false');
             newlink.setAttribute('href', `http://${link}`);
-            //tempCE = "true";
-            //tempHR = `${link}`;
             newlink.innerText = `${link}`;
             var newToggleEdit = document.createElement("button");
             newToggleEdit.id = "button";
@@ -659,19 +682,41 @@
             newli.appendChild(newlink);
             newli.appendChild(newToggleEdit);
 
-            //newli.innerHTML += ` <
-            //            a id = "${link}li"
-            //        contenteditable = "true"
-            //        href = "${link}>${link}</a>"
-            // `;
+            
             newUL.appendChild(newli);
 
-            //let linkEl = document.getElementById(`$ {link}li `);
-            //let linkHref = linkEl.getAttribute("href");
+           
 
         });
+        var addBookmarkdiv = document.createElement('div');
+        addBookmarkdiv.setAttribute("align", "right")
+        var addBookmarkbtn = document.createElement('button');
+        addBookmarkbtn.innerText = 'Add New Bookmark';
+        addBookmarkbtn.onclick = (e) => {
+            var newUL = document.getElementById(`${_id}Bookmarks`);
+            var newli = document.createElement('li');
+            var newlink = document.createElement('a');
+            newlink.setAttribute('contenteditable', 'false');
+            newlink.setAttribute('href', `http://www.google.com`);
+            newlink.innerText = `www.google.com`;
+            var newToggleEdit = document.createElement("button");
+            newToggleEdit.innerText = 'Edit';
+            newToggleEdit.onclick = (e) => {
+                var tempCE = newlink.getAttribute('contenteditable');
+                if (tempCE === "true") {
+                    newlink.setAttribute('href', `http://${newlink.innerText}`)
+                    newlink.setAttribute('contenteditable', 'false');
+                } else {
+                    newlink.setAttribute('contenteditable', 'true');
+                }
 
-
+            }
+            newli.appendChild(newlink);
+            newli.appendChild(newToggleEdit);
+            newUL.appendChild(newli);
+        }
+        addBookmarkdiv.appendChild(addBookmarkbtn);
+        newDiv.appendChild(addBookmarkdiv);
 
         if (saveToDatabase) {
 

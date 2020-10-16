@@ -236,6 +236,7 @@ input[type="button"]:hover:enabled {
     margin-left: 80%;
     width: 40px;
     height: 40px;
+    margin-right:0;
 }
 
 .fa-times-circle {
