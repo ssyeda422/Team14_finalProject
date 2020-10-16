@@ -28,8 +28,8 @@
             </div>
         </div>
 
-        <p class="greeting allText">
-            Hello, [user]!
+        <p class="greeting allText" id = "userGreeting">
+            Please log in.
         </p>
         <div>
             <button id="saveBtn" class="saveBtn allText" onclick="saveColors()"> <!--to be implemented onclick, should save all changes and send to database--->
@@ -209,6 +209,9 @@
             textElem[i].style.color = settings.fontColor;
         }
 
+        //change the greeting to say Hello, [USER]
+        var elem = document.getElementById("userGreeting");
+        elem.innerHTML = `Hello, ${settings.username}!`;
     }
 
     // Function should be implemented to log error in html
