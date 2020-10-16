@@ -219,6 +219,15 @@ input[type="button"]:hover:enabled {
     margin-top: 2%;
 }
 
+#button{
+    border: none;
+    outline: none;
+    color: black;
+    padding: 5px 8px;
+    background-color: inherit;
+    font-family: inherit; 
+}
+
 #closeBtn,
 #cardCloseBtn,
 .cardSaveBtn,
