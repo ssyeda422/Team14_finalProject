@@ -100,7 +100,7 @@
     window.onload = async() => {
         console.log('loading')
         await updateColors();
-        //await loadBoxesToPage();
+        await loadBoxesToPage();
     };
 
     var card = document.getElementById("testCard")
@@ -268,10 +268,10 @@
 
     // Function returns list of box objects.
     // Empty if not logged in or settings dont exist
-    function getBoxes() {
+    async function getBoxes() {
         let boxes = [];
 
-        fetch("/data")
+        await fetch("/data")
             .then(res => res.json())
             .then(json => {
                 if (!json.error) {
@@ -280,7 +280,6 @@
                     logError(json.error);
                 }
             });
-        //loadBoxesToPage(boxes);
         return boxes;
     }
 
@@ -404,11 +403,11 @@
         const tempBoxes = await getBoxes();
         tempBoxes.forEach(box => {
             if (box.type === 'text') {
-                genOldTextBox(box.title, box.items, box._id);
+                // genOldTextBox(box.title, box.items, box._id);
             } else if (box.type === 'todo') {
-                genOldToDoBox(box.title, box.items, box._id);
-            } else if (box.type === 'link') {
-                genOldBookmarksBox(box.title, box.items, box._id);
+                // genOldToDoBox(box.title, box.items, box._id);
+            } else if (box.type === 'Bookmarks') {
+                genNewBookmarksBox(box.title, box.items);
             } else {
                 console.log("invalid box type. cannot generate box");
             }
