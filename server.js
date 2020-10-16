@@ -167,6 +167,8 @@ app.post("/add", bodyParser.json(), async(req, res) => {
         return res.json({ error: "User Not LoggedIn" });
     }
     const newItem = req.body;
+    console.log('ID:' + newItem._id)
+    newItem._id = new mongodb.ObjectID(newItem._id)
     console.log(newItem);
 
     const client = new MongoClient(MONGO_URI, MONG_CONFIG);
@@ -193,7 +195,7 @@ app.post("/update", bodyParser.json(), async(req, res) => {
     await client.connect();
     const collection = client.db("t14-data").collection("boxes");
 
-    let _id = new mongodb.ObjectID(newItem._id);
+    let _id = newItem._id.length === 24 ? new mongodb.ObjectID(newItem._id) : newItem._id;
 
     let result = await collection.updateOne({ user: req.user._id, _id }, {
         $set: {
@@ -202,6 +204,38 @@ app.post("/update", bodyParser.json(), async(req, res) => {
             posY: newItem.posY,
             type: newItem.type,
             items: newItem.items
+        }
+    })
+
+    console.log(result.modifiedCount)
+
+    const todos = await collection.find({ user: req.user._id }).toArray();
+    await client.close();
+
+    return res.json(todos);
+})
+
+app.post("/updateBoxPos", bodyParser.json(), async(req, res) => {
+    if (!req.user) {
+        return res.json({ error: "User Not LoggedIn" });
+    }
+    const newItem = req.body;
+
+    if (!newItem.posX || !newItem.posY || !newItem._id) {
+        return res.json({ error: "Must include id and coord positions" })
+    }
+
+    const client = new MongoClient(MONGO_URI, MONG_CONFIG);
+
+    await client.connect();
+    const collection = client.db("t14-data").collection("boxes");
+
+    let _id = new mongodb.ObjectID(newItem._id)
+
+    let result = await collection.updateOne({ user: req.user._id, _id }, {
+        $set: {
+            posX: newItem.posX,
+            posY: newItem.posY,
         }
     })
 

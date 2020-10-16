@@ -1,96 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="style.css" />
 
     <title>Document</title>
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="navbar">
-      <div class="dropdown" id="setMenu">
-        <button class="dropbtn">
+        <div class="dropdown" id="setMenu">
+            <button class="dropbtn">
           <i class="fa fa-cog fa-lg allText"></i>
         </button>
-        <div class="dropdown-content accentElement">
-          <a href="/auth">Log In</a>
-          <a onclick = "showColorPicker(0)">
+            <div class="dropdown-content accentElement">
+                <a href="/auth">Log In</a>
+                <!--Once user logs in and is authenticated, add function to change Log In to Log Out-->
+                <a onclick="showColorPicker(0)">
             Background Color
           </a>
-          <a onclick = "showColorPicker(1)">Primary Color</a>
-          <a onclick = "showColorPicker(2)">Accent Color</a>
-          <a onclick = "showColorPicker(3)">Text Color</a>
+                <a onclick="showColorPicker(1)">Primary Color</a>
+                <a onclick="showColorPicker(2)">Accent Color</a>
+                <a onclick="showColorPicker(3)">Text Color</a>
+            </div>
         </div>
-      </div>
 
-      <p class="greeting allText">
-        hello, world!
-      </p>
-
-      <div class="dropdown" id="addCat">
-        <button class="dropbtn allText">
+        <p class="greeting allText">
+            Hello, [user]!
+        </p>
+        <div>
+            <button id="saveBtn" class="saveBtn allText" onclick="saveColors()"> <!--to be implemented onclick, should save all changes and send to database--->
+        Save Settings
+      </button>
+            <div class="dropdown" id="addCat">
+                <button class="dropbtn allText">
           Add Category
           <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-content accentElement" id="rightContent">
-          <a onclick="genTextCard('test', 'this is a test')">Text</a>
-          <a href="#">Todo</a>
-          <a href="#">Bookmarks</a>
+                <div class="dropdown-content accentElement" id="rightContent">
+                    <a onclick="genNewTextCard('test', 'this is a test')">Text</a>
+                    <a onclick="genNewToDoBox('todo', 'this is a test')">Todo</a>
+                    <a onclick="genNewBookmarksBox('bookmarks', ['www.google.com', 'www.wpi.edu'],0,0,true)">Bookmarks</a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     <h1></h1>
-    
-    <!--Testing putting the picker in a card that toggles with the background color button -->
-    <div id = "bgColorCard" class = "card primaryElement" hidden>
-      <div class = "container">
-        <button class="button" id="closeBtn" onclick = "hideColorPicker()">
+
+    <!-- putting the picker in a card that toggles with the background color button -->
+    <div id="bgColorCard" class="card primaryElement" hidden>
+        <div class="container">
+            <button class="button" id="closeBtn" onclick="hideColorPicker()">
                 <i class="fa fa-times-circle fa-lg"></i>
               </button>
-        <h4>
-          <b id = "colorPickerTitle" class = "allText">Set Background Color</b>
-          <p>
-             <div id="picker"></div>
-              <button class="button accentElement" id="setbgcolor">
+            <h4>
+                <b id="colorPickerTitle" class="allText">Set Background Color</b>
+                <p>
+                    <div id="picker"></div>
+                    <button class="button accentElement" id="setbgcolor">
                 Set Color
               </button>
-              <button class="button accentElement" id="reset">
+                    <button class="button accentElement" id="reset">
                 Reset
-              </button>         
-          </p>
-        </h4>
-      </div>
+              </button>
+                </p>
+            </h4>
+        </div>
     </div>
 
-    <div id="cards">
-       <div class="card draggable primaryElement">
+
+
+    <div class="card primaryElement" id="testCard">
+        <div id="testCardheader" class="accentElement">&nbsp;</div>
         <div class="container">
-          <h4 contenteditable="true" class = "allText"><b>Card Title</b></h4>
-          <p contenteditable="true" class = "allText">Card Test</p>
+            <h4 contenteditable="true" class="allText"><b>Card Title</b></h4>
+            <p contenteditable="true" class="allText">Card Test</p>
+            <button class="button allText cardSaveBtn" onclick="updateCard('testCard', 'Card Title', 'text', 'Card Test')">
+              <i class="fa fa-save fa-lg"></i>
+            </button>
+            <button class="button allText cardCloseBtn" onclick="deleteCard('testCard')">
+              <i class="fa fa-times-circle fa-lg"></i>
+            </button>
         </div>
-      </div>
-  </div>
+    </div>
+    </div>
     <!--Drag and drop API: https://api.jqueryui.com/draggable/-->
-    
-  
-  </body>
 
-  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-  <script>
-    window.onload = () => {};
-    
 
-    
+
+
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+<script>
+    window.onload = async() => {
+        console.log('loading')
+        await updateColors();
+        await loadBoxesToPage();
+    };
+
+    var card = document.getElementById("testCard")
+    dragElement(card);
     var pickerType = 0; //variable stores what kind of color picker to display. 0=background 1=primary 2=accent 3=text
 
     var colorPicker = new iro.ColorPicker("#picker", {
-      width: 150
+        width: 150
     });
 
     var body = document.querySelector("body");
@@ -98,144 +116,171 @@
     var reset = document.getElementById("reset");
 
     reset.onclick = function() {
-    
-      switch(pickerType){
-          case 0:
-            //background
-            body.style.backgroundColor = "white";
-            break;
-          case 1:
-            //primary
-            var elem = document.getElementsByClassName("primaryElement");          
-            for (var i = 0; i < elem.length; i++){
-              elem[i].style.backgroundColor = "white";
-            }
-            break;
-          case 2:
-            //accent
-             var elem = document.getElementsByClassName("accentElement");          
-            for (var i = 0; i < elem.length; i++){
-              elem[i].style.backgroundColor = "white";
-            }
-            break;
-          case 3:
-            //text
-            var elem = document.getElementsByClassName("allText");          
-            for (var i = 0; i < elem.length; i++){
-              elem[i].style.color = "black";
-            }
-            break;
-        }  
+
+        switch (pickerType) {
+            case 0:
+                //background
+                body.style.backgroundColor = "white";
+                break;
+            case 1:
+                //primary
+                var elem = document.getElementsByClassName("primaryElement");
+                for (var i = 0; i < elem.length; i++) {
+                    elem[i].style.backgroundColor = "white";
+                }
+                break;
+            case 2:
+                //accent
+                var elem = document.getElementsByClassName("accentElement");
+                for (var i = 0; i < elem.length; i++) {
+                    elem[i].style.backgroundColor = "white";
+                }
+                break;
+            case 3:
+                //text
+                var elem = document.getElementsByClassName("allText");
+                for (var i = 0; i < elem.length; i++) {
+                    elem[i].style.color = "black";
+                }
+                break;
+        }
     };
 
     colorPicker.on("color:change", function(color) {
-      setbg.onclick = function() {
-  
-        switch(pickerType){
-          case 0:
-            //background
-            body.style.backgroundColor = colorPicker.color.hexString;
-            break;
-          case 1:
-            //primary
-            var elem = document.getElementsByClassName("primaryElement");          
-            for (var i = 0; i < elem.length; i++){
-              elem[i].style.backgroundColor = colorPicker.color.hexString;
+        setbg.onclick = function() {
+
+            switch (pickerType) {
+                case 0:
+                    //background
+                    body.style.backgroundColor = colorPicker.color.hexString;
+                    break;
+                case 1:
+                    //primary
+                    var elem = document.getElementsByClassName("primaryElement");
+                    for (var i = 0; i < elem.length; i++) {
+                        elem[i].style.backgroundColor = colorPicker.color.hexString;
+                    }
+                    break;
+                case 2:
+                    //accent
+                    var elem = document.getElementsByClassName("accentElement");
+                    for (var i = 0; i < elem.length; i++) {
+                        elem[i].style.backgroundColor = colorPicker.color.hexString;
+                    }
+                    break;
+                case 3:
+                    //text
+                    var elem = document.getElementsByClassName("allText");
+                    for (var i = 0; i < elem.length; i++) {
+                        elem[i].style.color = colorPicker.color.hexString;
+                    }
+                    break;
             }
-            break;
-          case 2:
-            //accent
-            var elem = document.getElementsByClassName("accentElement");          
-            for (var i = 0; i < elem.length; i++){
-              elem[i].style.backgroundColor = colorPicker.color.hexString;
-            }
-            break;
-          case 3:
-            //text
-            var elem = document.getElementsByClassName("allText");          
-            for (var i = 0; i < elem.length; i++){
-              elem[i].style.color = colorPicker.color.hexString;
-            }
-            break;
-        }      
-        
-      };
+
+        };
     });
+
+    function saveColors() {
+        var textColor = (document.getElementById("colorPickerTitle")).style.color;
+        var accentColor = (document.getElementById("setbgcolor")).style.backgroundColor;
+        var primaryColor = (document.getElementById("testCard")).style.backgroundColor;
+        var backgroundColor = body.style.backgroundColor;
+
+        createOrUpdateSettings(backgroundColor, primaryColor, accentColor, textColor);
+
+    }
+
+    async function updateColors() {
+        let settings = await getSettings();
+        console.log(settings)
+        body.style.backgroundColor = settings.backgroundColor;
+        var primaryElem = document.getElementsByClassName("primaryElement");
+        for (var i = 0; i < primaryElem.length; i++) {
+            primaryElem[i].style.backgroundColor = settings.primaryColor;
+        }
+        var accentElem = document.getElementsByClassName("accentElement");
+        for (var i = 0; i < accentElem.length; i++) {
+            accentElem[i].style.backgroundColor = settings.accentColor;
+        }
+        var textElem = document.getElementsByClassName("allText");
+        for (var i = 0; i < textElem.length; i++) {
+            textElem[i].style.color = settings.fontColor;
+        }
+
+    }
 
     // Function should be implemented to log error in html
     //Function runs when error occurs like user not being logged in
     function logError(error) {
-      console.warn(error); //place holder
+        console.warn(error); //place holder
     }
 
     // Function returns object of settings.
     // Empty if not logged in or settings dont exist
-    function getSettings() {
-      let settings = {};
+    async function getSettings() {
+        let settings = {}
 
-      fetch("/settings")
-        .then(res => res.json())
-        .then(json => {
-          if (!json.error) {
-            settings = json;
-          } else {
-            logError(json.error);
-          }
-        });
-
-      return settings;
+        await fetch("/settings")
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    settings = json;
+                } else {
+                    logError(json.error);
+                }
+            });
+        return settings
     }
 
     //Function creates or updates settings also returns settings.
     // MUST include all params
     function createOrUpdateSettings(
-      backgroundColor,
-      primaryColor,
-      accentColor,
-      fontColor
+        backgroundColor,
+        primaryColor,
+        accentColor,
+        fontColor
     ) {
-      let settings = {};
+        let settings = {};
 
-      fetch("/updatesettings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          backgroundColor,
-          primaryColor,
-          accentColor,
-          fontColor
-        })
-      })
-        .then(res => res.json())
-        .then(json => {
-          if (!json.error) {
-            settings = json;
-          } else {
-            logError(json.error);
-          }
-        });
+        fetch("/updatesettings", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    backgroundColor,
+                    primaryColor,
+                    accentColor,
+                    fontColor
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    settings = json;
+                } else {
+                    logError(json.error);
+                }
+            });
 
-      return settings;
+        return settings;
     }
 
     // Function returns list of box objects.
     // Empty if not logged in or settings dont exist
-    function getBoxes() {
-      let boxes = [];
+    async function getBoxes() {
+        let boxes = [];
 
-      fetch("/data")
-        .then(res => res.json())
-        .then(json => {
-          if (!json.error) {
-            boxes = json;
-          } else {
-            logError(json.error);
-          }
-        });
-      loadBoxesToPage(boxes);
-      return boxes;
+        await fetch("/data")
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json;
+                } else {
+                    logError(json.error);
+                }
+            });
+        return boxes;
     }
 
     // Function adds a box
@@ -244,177 +289,552 @@
     // type: should be specific strings ('todo','text','link')
     // items: is a list/array of whatever you want
     // also returns boxes
-    function addBox(title, posX, posY, type, items) {
-      let boxes = [];
+    function addBox(_id, title, posX, posY, type, items) {
+        let boxes = [];
 
-      fetch("/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          title,
-          posX,
-          posY,
-          type,
-          items
-        })
-      })
-        .then(res => res.json())
-        .then(json => {
-          if (!json.error) {
-            boxes = json;
-          } else {
-            logError(json.error);
-          }
-        });
+        fetch("/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    _id,
+                    title,
+                    posX,
+                    posY,
+                    type,
+                    items
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json;
+                } else {
+                    logError(json.error);
+                }
+            });
 
-      //add the element to the page
-      loadBoxesToPage(boxes);
-      return boxes;
+        //add the element to the page
+        //loadBoxesToPage(boxes);
+        return boxes;
     }
+
+    function updateCard(_id, title, type, items) {
+
+        //get the posX and posY
+        var card = document.getElementById(_id);
+        var cardOffset = offset(card);
+        var posX = cardOffset.left;
+        var posY = cardOffset.top;
+        //call updateBox
+        updateBox(_id, title, posX, posY, type, items);
+    }
+
 
     // Function updates a box. use all params
     // Returns updated boxes
     function updateBox(_id, title, posX, posY, type, items) {
-      let boxes = [];
+        let boxes = [];
 
-      fetch("/update", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          _id,
-          title,
-          posX,
-          posY,
-          type,
-          items
-        })
-      })
-        .then(res => res.json())
-        .then(json => {
-          if (!json.error) {
-            boxes = json;
-          } else {
-            logError(json.error);
-          }
-        });
-      loadBoxesToPage(boxes);
-      return boxes;
+        fetch("/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    _id,
+                    title,
+                    posX,
+                    posY,
+                    type,
+                    items
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json;
+                } else {
+                    logError(json.error);
+                }
+            });
+
+        return boxes;
+    }
+
+    function updateBoxPos(_id, posY, posX) {
+        let boxes = [];
+
+        fetch("/updateBoxPos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    _id,
+                    posX,
+                    posY,
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json;
+                } else {
+                    logError(json.error);
+                }
+            });
+
+
+        return boxes;
+    }
+
+
+    function deleteCard(id) {
+        deleteBox(id);
+        var elem = document.getElementById(id);
+        elem.remove();
     }
 
     //Function deletes entire box
     // also returns boxes
     function deleteBox(_id) {
-      let boxes = [];
 
-      fetch("/remove", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          _id
-        })
-      })
-        .then(res => res.json())
-        .then(json => {
-          if (!json.error) {
-            boxes = json;
-          } else {
-            logError(json.error);
-          }
+        let boxes = [];
+
+        fetch("/remove", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    _id
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.error) {
+                    boxes = json;
+                } else {
+                    logError(json.error);
+                }
+            });
+        //loadBoxesToPage(boxes);
+
+
+        return boxes;
+    }
+
+    // loads boxes from database onto page
+    async function loadBoxesToPage() {
+        const tempBoxes = await getBoxes();
+        tempBoxes.forEach(box => {
+            if (box.type === 'text') {
+                // genOldTextBox(box.title, box.items, box._id);
+            } else if (box.type === 'todo') {
+                // genOldToDoBox(box.title, box.items, box._id);
+            } else if (box.type === 'Bookmarks') {
+                genNewBookmarksBox(box.title, box.items, box.posY, box.posX, false, box._id);
+            } else {
+                console.log("invalid box type. cannot generate box");
+            }
         });
-      loadBoxesToPage(boxes);
-      return boxes;
-    }
-    
-    function loadBoxesToPage(boxes){
-      const tempBoxes = boxes;
-      tempBoxes.forEach(box => {
-        if (box.type === 'text'){
-          genTextBox(box.title, box.items);
-        }
-        else if (box.type === 'todo'){
-          genToDoBox(box.title, box.items);
-        }
-        else if (box.type === 'link'){
-          genBookmarksBox(box.title, box.items);
-        }
-        else {
-          console.log("invalid box type. cannot generate box");
-        }
-      });
     }
 
-    //generates a new text card
-    function genTextBox(title, description){
-      var cards = document.getElementById("cards");
-      cards.innerHTML += `
-        <div class="card draggable">
+    // generates a random ID value to identify different boxes
+    function genIDValue() {
+        function dec2hex(dec) {
+            return dec < 10 ?
+                '0' + String(dec) :
+                dec.toString(16)
+        }
+
+        // generateId :: Integer -> String
+        function generateId(len) {
+            var arr = new Uint8Array((len || 40) / 2)
+            window.crypto.getRandomValues(arr)
+            return Array.from(arr, dec2hex).join('')
+        }
+        let ran = generateId(24)
+
+        while (ran.length !== 24) {
+            ran = generateId(24)
+        }
+
+        return ran
+    }
+
+    //generates a new Text card that's not in the database
+    function genNewTextCard(title, description) {
+        var _id = genIDValue();
+        const newDiv = document.createElement("div");
+        document.body.appendChild(newDiv);
+        newDiv.id = _id;
+        newDiv.className = "card primaryElement";
+
+        //var cards = document.getElementById("cards");
+        newDiv.innerHTML += `
+          <div id="${_id}header" class = "accentElement" style="padding: 0px;
+                                  cursor: move;
+                                  color: black;
+                                  z-index: 10;
+                                  background-color: #d3d3d3;">&nbsp;</div>
           <div class="container">
             <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
             <p contenteditable="true" class = "allText">${description}</p>
           </div>
-        </div>
+          <button class="button allText cardSaveBtn" onclick="updateBox('${_id}', '${title}', 0, 0, 'text', '${description}')">
+              <i class="fa fa-save fa-lg"></i>
+            </button>
+            <button class="button allText cardCloseBtn" onclick="deleteCard('${_id}')">
+              <i class="fa fa-times-circle fa-lg"></i>
+            </button>
         `;
-      
-      //dummy values for posX and posY for now
-      addBox(title, 0, 0, "Text", description);
-    
-  }
-    
-  
-    
-    function genToDoBox(title, items){
-      // to be finished later
+
+
+        dragElement(newDiv);
+
+
+        //dummy values for posX and posY for now
+        addBox(_id, title, 0, 0, "Text", description);
+
     }
-    
-    function genBookmarksBox(title, link){
-      var cards = document.getElementById("cards");
-      cards.innerHTML += `
-        <div class="card draggable">
+
+    /*function genOldTextCard(title, description, _id) {
+        const newDiv = document.createElement("div");
+        newDiv.id = _id;
+        newDiv.className = "card primaryElement";
+
+        //var cards = document.getElementById("cards");
+        newDiv.innerHTML += `
+          <div id="${_id}header" class = "accentElement">&nbsp;</div>
           <div class="container">
-            <a href="${link}" ><b>${title}</b></h4>
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <p contenteditable="true" class = "allText">${description}</p>
           </div>
-        </div>
         `;
+
+
+        dragElement(newDiv);
+        document.body.appendChild(newDiv);
+
+        //dummy values for posX and posY for now
+        //addBox(title, 0, 0, "Text", description); <- don't need this if we wanna generate a box that already exists in the database
+
+    }*/
+
+    function offset(el) {
+        var rect = el.getBoundingClientRect(),
+            scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+            scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        return {
+            top: rect.top + scrollTop,
+            left: rect.left + scrollLeft
+        }
     }
-    
+
+    function genNewToDoBox(title, items) {
+        // to be finished later
+        var _id = genIDValue();
+        const newToDo = document.createElement("div");
+        document.body.appendChild(newToDo);
+        newToDo.id = _id;
+        newToDo.className = "card primaryElement";
+
+        //var cards = document.getElementById("cards");
+        newToDo.innerHTML += `
+          <div id="${_id}header" class = "accentElement" style="padding: 0px;
+                                  cursor: move;
+                                  color: black;
+                                  z-index: 10;
+                                  background-color: #d3d3d3;">&nbsp;</div>
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <ul contenteditable="true" class = "allText"><li>${items}<li></ul>
+          </div>
+          <button class="button allText cardSaveBtn" onclick="updateCard('${_id}', '${title}', 'ToDo', '${items}')">
+              <i class="fa fa-save fa-lg"></i>
+            </button>
+            <button class="button allText cardCloseBtn" onclick="deleteCard('${_id}')">
+              <i class="fa fa-times-circle fa-lg"></i>
+            </button>
+        `;
+
+
+        dragElement(newToDo);
+
+
+        //dummy values for posX and posY for now
+        addBox(_id, title, 0, 0, "ToDo", items);
+    }
+
+    function genOldToDoBox(title, items, _id) {
+        // to be finished later
+        const newToDo = document.createElement("div");
+        newToDo.id = _id;
+        newToDo.className = "card primaryElement";
+
+        //var cards = document.getElementById("cards");
+        newToDo.innerHTML += `
+          <div id="cardsheader">&nbsp;</div>
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <ul contenteditable="true" class = "allText"><li>${items}<li></ul>
+          </div>
+        `;
+
+
+        dragElement(newToDo);
+        document.body.appendChild(newToDo);
+
+        //dummy values for posX and posY for now
+        //addBox(title, 0, 0, "ToDo", items);
+    }
+
+
+    function genNewBookmarksBox(title, links, y, x, saveToDatabase, id) {
+        var _id = id ? id : genIDValue();
+        const newDiv = document.createElement("div");
+        document.body.appendChild(newDiv);
+        newDiv.id = _id;
+        newDiv.className = "card primaryElement";
+        var idName = String(_id + "header");
+        console.log(idName);
+        console.log(links);
+        console.log(y)
+        newDiv.style.top = y + 'px'
+        newDiv.style.left = x + 'px'
+        console.log(newDiv.style.top)
+            //var cards = document.getElementById("cards");
+        newDiv.innerHTML += `
+          <div id="${idName}" class ="accentElement" style="padding: 0px;
+                                  cursor: move;
+                                  color: black;
+                                  z-index: 10;
+                                  background-color: #d3d3d3;">&nbsp;</div>
+          <div class="container">
+            <h4 contenteditable="true" class = "allText"><b>${title}</b></h4>
+            <ul id="${_id}Bookmarks">
+              <li>Test</li>
+              </ul>
+          </div>
+          <button class="button allText cardSaveBtn" onclick="updateCard('${_id}', '${title}', 'Bookmarks', 'Card Test')">
+              <i class="fa fa-save fa-lg"></i>
+            </button>
+            <button class="button allText cardCloseBtn" onclick="deleteCard('${_id}')">
+              <i class="fa fa-times-circle fa-lg"></i>
+            </button>
+        `;
+
+        dragElement(newDiv);
+        var newUL = document.getElementById(`${_id}Bookmarks`);
+        links.forEach(link => {
+            var newli = document.createElement('li');
+            var newlink = document.createElement('a');
+            //var tempID = newlink.getAttribute('id');
+            //var tempCE = newlink.getAttribute('contenteditable');
+            //var tempHR = newlink.getAttribute('href');
+            newlink.setAttribute('id', `${link}li`);
+            newlink.setAttribute('contenteditable', 'false');
+            newlink.setAttribute('href', `http://${link}`);
+            //tempCE = "true";
+            //tempHR = `${link}`;
+            newlink.innerText = `${link}`;
+            var newToggleEdit = document.createElement("button");
+            newToggleEdit.innerText = 'Edit';
+            newToggleEdit.onclick = (e) => {
+                var tempCE = newlink.getAttribute('contenteditable');
+                if (tempCE === "true") {
+                    newlink.setAttribute('href', `http://${newlink.innerText}`)
+                    newlink.setAttribute('contenteditable', 'false');
+                } else {
+                    newlink.setAttribute('contenteditable', 'true');
+                }
+
+            }
+            newli.appendChild(newlink);
+            newli.appendChild(newToggleEdit);
+
+            //newli.innerHTML += ` <
+            //            a id = "${link}li"
+            //        contenteditable = "true"
+            //        href = "${link}>${link}</a>"
+            // `;
+            newUL.appendChild(newli);
+
+            //let linkEl = document.getElementById(`$ {link}li `);
+            //let linkHref = linkEl.getAttribute("href");
+
+        });
+
+
+
+        if (saveToDatabase) {
+
+            let newY = newDiv.style.top ? newDiv.style.top.replace('px', '') : 0
+            let newX = newDiv.style.left ? newDiv.style.left.replace('px', '') : 0
+
+
+            addBox(_id, title, newX, newY, "Bookmarks", links);
+        }
+    }
+
+    // takes the list elmnt and list of links and adds the links as 
+    function genBookmarksList(listElmnt, links) {
+        var ul = document.getElementById(listElmnt);
+        links.forEach(link => {
+            var newli = document.createElement('li');
+            newli.innerHTML += ` <
+                        a id = "${link}li"
+                    contenteditable = "true"
+                    href = "${link}>${link}</a>"
+                    `;
+            ul.appendChild(newli);
+
+            let linkEl = document.getElementById(`
+                    $ {
+                        link
+                    }
+                    li `)
+            let linkHref = linkEl.getAttribute("href");
+            linkEl.onchange = (e) => {
+                linkHref = linkEl.innerText
+            };
+        });
+
+
+    }
+
+
+
+    /*  function genOldBookmarksBox(title, link, _id) {
+          const newDiv = document.createElement("div");
+          newDiv.id = _id;
+          newDiv.className = "card primaryElement";
+
+          //var cards = document.getElementById("cards");
+          newDiv.innerHTML += ` <
+                        div id = "cardsheader" > & nbsp; < /div> <
+                    div class = "container" >
+                        <
+                        h4 contenteditable = "true"
+                    class = "allText" > < b > $ {
+                        title
+                    } < /b></h
+                    4 >
+                        <
+                        ul > < li class = "allText" > $ {
+                            link
+                        } < /li></ul >
+                        <
+                        /div>
+                    `;
+
+
+          dragElement(newDiv);
+          document.body.appendChild(newDiv);
+
+          //dummy values for posX and posY for now
+          //addBox(title, 0, 0, "Bookmarks", link);
+      }*/
+
     //hide and show the color picker
-    function showColorPicker(type){
-      //set the type of the color picker
-      pickerType = type;
-      var elem = document.getElementById("bgColorCard");
-      //also should change the name of the picker
-      var title = document.getElementById("colorPickerTitle");
-      switch(pickerType){
-        case 0:
-          //background
-          title.innerHTML = "Set Background Color";
-          break;
-        case 1:
-          //card
-          title.innerHTML = "Set Primary Color";
-          break;
-        case 2:
-          //accent elements
-          title.innerHTML = "Set Accent Color";
-          break;
-        case 3:
-          //text
-          title.innerHTML = "Set Text Color";
-          break;
-      }
-          
-      elem.hidden = false;
+    function showColorPicker(type) {
+        //set the type of the color picker
+        pickerType = type;
+        var elem = document.getElementById("bgColorCard");
+        //also should change the name of the picker
+        var title = document.getElementById("colorPickerTitle");
+        switch (pickerType) {
+            case 0:
+                //background
+                title.innerHTML = "Set Background Color";
+                break;
+            case 1:
+                //card
+                title.innerHTML = "Set Primary Color";
+                break;
+            case 2:
+                //accent elements
+                title.innerHTML = "Set Accent Color";
+                break;
+            case 3:
+                //text
+                title.innerHTML = "Set Text Color";
+                break;
+        }
+
+        elem.hidden = false;
     }
-    
-    function hideColorPicker(){
-      var elem = document.getElementById("bgColorCard");
-      elem.hidden = true;
+
+    function hideColorPicker() {
+        var elem = document.getElementById("bgColorCard");
+        elem.hidden = true;
     }
-  </script>
+
+
+
+
+
+    // Make the DIV element draggable:
+    var draggableElements = document.getElementsByClassName("card");
+
+    for (var i = 0; i < draggableElements.length; i++) {
+        dragElement(draggableElements[i]);
+    }
+
+    function dragElement(elmnt) {
+        var pos1 = 0,
+            pos2 = 0,
+            pos3 = 0,
+            pos4 = 0;
+        if (document.getElementById(elmnt.id + "header")) {
+            // if present, the header is where you move the DIV from:
+            //RIGHT NOW THE HEADERS ARE NOT BEING FOUND
+            document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        } else {
+            // otherwise, move the DIV from anywhere inside the DIV:
+            //WE DON'T WANT THIS TO HAPPEN
+            //PREVENTS EDITING THE TEXT AND RESIZING THE ELEMENT
+            //CURRENTLY THIS IS WHAT IS HAPPENING
+            //elmnt.onmousedown = dragMouseDown;
+            console.log("In the else case");
+        }
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            // stop moving when mouse button is released:
+            document.onmouseup = null;
+            document.onmousemove = null;
+            updateBoxPos(elmnt.id,
+                elmnt.style.top.replace('px', ''),
+                elmnt.style.left.replace('px', ''))
+        }
+    }
+</script>
+
 </html>
