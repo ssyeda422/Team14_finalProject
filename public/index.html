@@ -71,20 +71,22 @@
         </div>
     </div>
 
-
-
     <div class="card primaryElement" id="testCard">
-        <div id="testCardheader" class="accentElement">&nbsp;</div>
+        <div id="testCardheader" class="accentElement" style="padding: 0px;
+        cursor: move;
+        color: black;
+        z-index: 10;
+        background-color: #d3d3d3;">&nbsp;</div>
         <div class="container">
-            <h4 contenteditable="true" class="allText"><b>Card Title</b></h4>
-            <p contenteditable="true" class="allText">Card Test</p>
+            <h4 contenteditable="true" class="allText"><b>Sample Title</b></h4>
+            <p contenteditable="true" class="allText">Sample Card Text</p>
+        </div>
             <button class="button allText cardSaveBtn" onclick="updateCard('testCard', 'Card Title', 'text', 'Card Test')">
               <i class="fa fa-save fa-lg"></i>
             </button>
             <button class="button allText cardCloseBtn" onclick="deleteCard('testCard')">
               <i class="fa fa-times-circle fa-lg"></i>
             </button>
-        </div>
     </div>
     </div>
     <!--Drag and drop API: https://api.jqueryui.com/draggable/-->
@@ -642,7 +644,8 @@
             //tempHR = `${link}`;
             newlink.innerText = `${link}`;
             var newToggleEdit = document.createElement("button");
-            newToggleEdit.innerText = 'Edit';
+            newToggleEdit.id = "button";
+            newToggleEdit.innerHTML = '<i class="fa fa-pencil" aria-hidden="true"></i>';
             newToggleEdit.onclick = (e) => {
                 var tempCE = newlink.getAttribute('contenteditable');
                 if (tempCE === "true") {
