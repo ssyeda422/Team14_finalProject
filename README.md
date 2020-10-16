@@ -1,44 +1,41 @@
-# cs4241-FinalProject
+# CS4241 Group 12 Final Project
 
-For your final project, you'll implement a course project that exhibits your mastery of the course materials. 
-This project should provide an opportunity to be creative and to pursue individual research and learning.
+Matthew Gulbin, Alan Curiel, Madeline Perry, Saniya Syeda  
+CS4241  
+October 16, 2020  
 
-## General description
+**Link to Project:** 
 
-Your project should consist of a complete Web application, exhibiting facets of the three main sections of the course material:
+**1. Description:** 
+A browser home page application that has customizable boxes/categories that users can fill in to have bookmarks, notes, tasks, and images. The idea is that the user will open their browser and use this page to start their day/work/session. The user will be able to log in so that their content persists between sessions. This application is targeted at users who use their computers on a daily basis and would like a customizable web browsing experience. The application will make use of a database in MongoDB to store the homepage layout, input, preferences, etc.  
 
-- Static Web page content and design. You should have a project that is accessible, easily navigable, and features significant content.
-- Dynamic behavior implemented with JavaScript (TypeScript is also allowed if your group wants to explore it).
-- Server-side programming *using Node.js*. Typically this will take the form of some sort of persistent data, authentication, and possibly server-side computation. Ideally it will also include support for realtime commmunication as discussed below.
-- Groups are *highly encouraged* to consider including some type of realtime communication technology in their projects (chat, networked multiplayer games, collaborative coding/editing, video/audio via WebRTC etc.) We'll be discussing many of these technologies in class next week. 
-- A video (less than five minutes) where each group member explains some aspect of the project. An easy way to produce this video is for you all the groups members to join a Zoom call that is recorded; each member can share their screen when they discuss the project or one member can "drive" the interface while other members narrate (this second option will probably work better.) The video should be posted on YouTube or some other accessible video hosting service. 
+***Key Features:***
+Draggable content boxes (ex. box for bookmarks, notes, tasks, etc.)  
+Login page, each user will have a different homepage.  
+Persistent data between sessions  
+Customization for elements (background color, box size, text size, font style/color)  
+Github login  
 
-## Project ideation
+**2. Application Instructions:**  
+The application authorizes users via Github. To login, go to the settings button in the top left and click "Log In" in the dropdown. The settings dropdown also contains options for changing the background color, primary color, accent color, and text color. To save your color preference, click the "Save Settings" button in the top right. To add new boxes, go to the "Add New Category" dropdown in the top right and click on the type of box preferred (regular text, bookmarks, or to-do). The boxes are resizable and draggable. To save content within each box, click the save icon in the top right of the box. To delete, click the x button. To edit a bookmark, click the edit button next to each link. To go to that link, click the edit button again, which allows the user to click on the link. 
 
-Excellent projects serve someone/some group; for this assignment you need to define your users and stakeholders. I encourage you to identify projects that will have impact, either artistically, politically, or in terms of productivity. Consider creating something useful for a cause or hobby you care about.
+**3. Technologies Used:**
+fksdjflsdjfdl
 
-## Logistics
+**Challenges:**
+Making each box both draggable, resizable, and editable (had issues with not having a "handle" for each box, which prevented the content inside from being editable. We had to figure out how to generate unique id's for each box handle and pass each one into a drag element function so that each one could respond to the mouse drag event.
+Sending different kinds of data to the server, e.g:
+- Saving the position of each box across sessions to restore in the same place on the page on pageload.
+- Saving the colors of each element class (background, primary, accent, text) and restoring them on pageload.
+Making the bookmark links both editable and clickable (to bring user to that page).
+CSS styling for header dropdowns and individual kinds of buttons
 
-### Team size
-Students are will work in teams of 3-5 students for the project; teams of two can be approved with the permission of the instructor. Working in teams will allow you to build a good project in a limited amount of time.
 
-### Deliverables
-
-__Proposal:__ 
-Provide an outline of your project direction and the names of the team members. 
-The outline should have enough detail so that staff can determine if it meets the minimum expectations, or if it goes too far to be reasonable by the deadline.
-This file must be named proposal.md so we can find it.
-Submit a PR to turn it in by Monday, 11:59 PM
-
-There are no other scheduled checkpoints for your project. 
-
-#### Turning in Your Outline / Project
-
-**NOTE: code is due before the project presentation day due to the end of term / grading schedule constraints**
-Submit a second PR on the final project repo to turn in your app and code.
-
-Deploy your app, in the form of a webpage, to Glitch/Heroku/Digital Ocean or some other service.
-Folks on the same team do not need to post the same webpage, but must instead clearly state who is on the team in their proposal.
+**5. Work Division**
+Matthew: Database, front-end JS  
+Alan: Backend server (Node/express), bit of front-end js  
+Madeline: HTML/CSS, front-end JS   
+Saniya: HTML/CSS, front-end JS  
 
 The README for your second pull request doesn’t need to be a formal report, but it should contain:
 
@@ -50,7 +47,3 @@ The README for your second pull request doesn’t need to be a formal report, bu
 6. A link to your project video.
 
 Think of 1,3, and 4 in particular in a similar vein to the design / tech achievements for A1—A4… make a case for why what you did was challenging and why your implementation deserves a grade of 100%.
-
-## FAQs
-
-- **Can I use XYZ framework?** You can use any web-based frameworks or tools available, but for your server programming you need to use node.js. Your client-side language should be either JavaScript or TypeScript.
